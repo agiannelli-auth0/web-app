@@ -47,19 +47,6 @@ app.use(
    })
 );
 
-const expenses = [
-  {
-    date: new Date(),
-    description: "Pizza for a Coding Dojo session.",
-    value: 102,
-  },
-  {
-    date: new Date(),
-    description: "Coffee for a Coding Dojo session.",
-    value: 42,
-  },
-];
-
 app.get("/", async (req, res, next) => {
  try {
   const summary = await axios.get(`${API_URL}/total`);
@@ -83,10 +70,15 @@ app.get("/user", requiresAuth(), async (req, res) => {
 });
 
 app.get("/expenses", requiresAuth(), async (req, res, next) => {
+ try {
+  const expenses = await axios.get(`${API_URL}/reports`);
   res.render("expenses", {
-    user: req.oidc && req.oidc.user,
-    expenses,
+   user: req.oidc && req.oidc.user,
+   expenses: expenses.data,
   });
+ } catch (err) {
+  next(err);
+ }
 });
 
 // catch 404 and forward to error handler
